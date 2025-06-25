@@ -39,7 +39,6 @@
       "labels": ["breaking-change"]
     }
   ],
-  "schedule": ["before 4am on monday"],
   "timezone": "UTC",
   "labels": ["dependencies", "docker"],
   "assignees": ["@me"],
@@ -50,5 +49,8 @@
   "commitMessageAction": "Update",
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "to {{newVersion}}",
-  "commitMessagePrefix": "chore(deps):"
+  "commitMessagePrefix": "chore(deps):",
+  "onboarding": true,
+  "requireConfig": false,
+  "repositories": ["local"]
 } 
