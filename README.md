@@ -14,39 +14,6 @@ This repository uses [Renovate](https://github.com/renovatebot/renovate) for aut
 - **Major updates**: Require manual review and are labeled as breaking changes
 - **Authentik updates**: Patch updates auto-merge, minor/major require review
 
-## 🚀 Migration from Production Setup
-
-If you're migrating from a production setup with `authentik-prod-1-*` naming:
-
-### Option 1: Automated Migration (Recommended)
-```bash
-# 1. Create a backup first
-./backup-data.sh
-
-# 2. Run the migration script
-./migrate-to-public.sh
-```
-
-### Option 2: Manual Migration
-```bash
-# 1. Stop current containers
-docker-compose down
-
-# 2. Ensure networks exist
-docker network create frontend
-docker network create backend
-
-# 3. Start with new configuration
-docker-compose up -d
-```
-
-**Data Safety**: All your data will be preserved during migration:
-- ✅ PostgreSQL database data
-- ✅ Redis cache data  
-- ✅ Media files
-- ✅ Custom templates
-- ✅ SSL certificates
-
 ## Prerequisites
 
 - Docker and Docker Compose installed
@@ -63,35 +30,28 @@ cd <repository-name>
 
 ### 2. Create Required Secret Files
 
-You need to create the following secret files before running the containers:
+You need to create the following secret files before running the containers. You can either generate secure random secrets or use your own values:
 
 ```bash
 # Create secrets directory
 mkdir -p secrets
 
-# Create secret files (replace with your actual values)
-echo "your-secret-key-here" > secrets/authentik_secret_key.txt
-echo "your-postgres-password-here" > secrets/postgres_password.txt
-echo "your-authentik-postgres-password-here" > secrets/authentik_postgressql__password.txt
+# Generate secure random secrets using OpenSSL
+openssl rand -base64 32 > secrets/authentik_secret_key.txt
+openssl rand -base64 24 > secrets/postgres_password.txt
+openssl rand -base64 24 > secrets/authentik_postgressql__password.txt
 ```
 
-### 3. Create SSL Certificates (Optional)
+**Note**: The Authentik secret key should be at least 32 characters long. The OpenSSL command generates a 32-byte random string encoded in base64, which provides excellent security.
 
-If you need SSL certificates, create them in the `certs/` directory:
-
-```bash
-mkdir -p certs
-# Add your SSL certificates here
-```
-
-### 4. Create Required Networks
+### 3. Create Required Networks
 
 ```bash
 docker network create frontend
 docker network create backend
 ```
 
-### 5. Start the Services
+### 4. Start the Services
 
 ```bash
 docker-compose up -d
@@ -103,9 +63,6 @@ docker-compose up -d
 .
 ├── docker-compose.yaml      # Main Docker Compose configuration
 ├── renovate.json           # Renovate configuration for automated updates
-├── .env.example            # Example environment variables
-├── backup-data.sh          # Data backup script
-├── migrate-to-public.sh    # Migration script for production setups
 ├── secrets/                # Secret files (not in version control)
 │   ├── authentik_secret_key.txt
 │   ├── postgres_password.txt
@@ -123,21 +80,6 @@ docker-compose up -d
 - **server**: Authentik main server
 - **worker**: Authentik background worker
 
-## Ports
-
-- **9000**: HTTP port
-- **9443**: HTTPS port
-
-## Security Considerations
-
-1. **Never commit secrets**: All secret files are excluded from version control
-2. **Use strong passwords**: Generate strong, unique passwords for all services
-3. **SSL certificates**: Use proper SSL certificates for production deployments
-4. **Network security**: The setup uses separate frontend and backend networks
-5. **Regular updates**: Renovate automatically handles dependency updates
-6. **Sanitized configuration**: Production-specific naming has been removed
-7. **Data persistence**: Named volumes ensure data survives container restarts
-
 ## Environment Variables
 
 The following environment variables are configured:
@@ -145,8 +87,6 @@ The following environment variables are configured:
 - `AUTHENTIK_SECRET_KEY`: Secret key for Authentik
 - `AUTHENTIK_REDIS__HOST`: Redis host
 - `AUTHENTIK_POSTGRESQL__*`: PostgreSQL connection details
-
-See `.env.example` for additional configuration options.
 
 ## Automated Updates with Renovate
 
@@ -164,46 +104,3 @@ The `renovate.json` file configures:
 - **Manual review**: Minor and major updates for Authentik
 - **Labels**: Automatic labeling for dependency updates
 - **Schedule**: Weekly updates to minimize disruption
-
-## Troubleshooting
-
-### Check Service Status
-
-```bash
-docker-compose ps
-```
-
-### View Logs
-
-```bash
-docker-compose logs -f [service-name]
-```
-
-### Health Checks
-
-The services include health checks for PostgreSQL and Redis. Check their status:
-
-```bash
-docker-compose ps
-```
-
-### Data Backup
-
-Create a backup before making changes:
-
-```bash
-./backup-data.sh
-```
-
-## Contributing
-
-When contributing to this repository:
-
-1. Never commit secret files
-2. Update the README if configuration changes
-3. Test changes in a development environment first
-4. Follow the existing naming conventions (sanitized for public use)
-
-## License
-
-[Add your license information here] 
