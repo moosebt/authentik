@@ -2,10 +2,6 @@
 
 This repository contains a Docker Compose configuration for running Authentik, an open-source Identity Provider.
 
-## ⚠️ Security Notice
-
-This repository contains sensitive configuration files that are excluded from version control via `.gitignore`. Before running this setup, you must create the required secret files.
-
 ## 🔄 Automated Updates
 
 This repository uses [Renovate](https://github.com/renovatebot/renovate) for automated dependency updates:
